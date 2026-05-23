@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bodylog-v1';
+const CACHE_NAME = 'bodylog-v2';
 const urlsToCache = [
   '/cocobody/diet_app_v2.html',
   '/cocobody/manifest.json'
