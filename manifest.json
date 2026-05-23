@@ -1,0 +1,22 @@
+{
+  "name": "BodyLog",
+  "short_name": "BodyLog",
+  "description": "ダイエット管理システム",
+  "start_url": "/cocobody/diet_app_v2.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1D9E75",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
