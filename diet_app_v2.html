@@ -247,11 +247,12 @@ button:active{transform:scale(0.98)}
               <div class="meal-block" style="margin-bottom:16px;padding-bottom:16px;border-bottom:0.5px solid var(--br)">
                 <div style="font-size:12px;font-weight:500;color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-sun" style="color:#BA7517"></i>朝食</div>
                 <div class="grid2">
-                  <div class="field full"><label>内容</label><input id="si-bf" placeholder="例：白米、卵、味噌汁"></div>
+                  <div class="field"><label>食事時間</label><input id="si-bf-t" type="time"></div>
                   <div class="field"><label>食事量 (g) <span style="color:var(--tx3);font-size:10px">上限300g</span></label>
                     <input id="si-bf-g" type="number" min="0" max="300" placeholder="300" oninput="checkMealAmount(this,'si-bf-warn')">
                     <span id="si-bf-warn" style="display:none;font-size:11px;color:var(--red)">⚠ 300gを超えています</span>
                   </div>
+                  <div class="field full"><label>内容</label><input id="si-bf" placeholder="例：白米、卵、味噌汁"></div>
                   <div class="field"><label>写真</label><input type="file" id="si-bf-img" accept="image/*" onchange="previewMeal(this,'si-bf-preview')" style="font-size:12px;padding:5px"></div>
                 </div>
                 <img id="si-bf-preview" src="" style="display:none;max-width:100%;max-height:160px;border-radius:var(--r);margin-top:6px;object-fit:cover">
@@ -260,11 +261,12 @@ button:active{transform:scale(0.98)}
               <div class="meal-block" style="margin-bottom:16px;padding-bottom:16px;border-bottom:0.5px solid var(--br)">
                 <div style="font-size:12px;font-weight:500;color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-clock" style="color:#185FA5"></i>昼食</div>
                 <div class="grid2">
-                  <div class="field full"><label>内容</label><input id="si-lu" placeholder="例：定食"></div>
+                  <div class="field"><label>食事時間</label><input id="si-lu-t" type="time"></div>
                   <div class="field"><label>食事量 (g) <span style="color:var(--tx3);font-size:10px">上限300g</span></label>
                     <input id="si-lu-g" type="number" min="0" max="300" placeholder="300" oninput="checkMealAmount(this,'si-lu-warn')">
                     <span id="si-lu-warn" style="display:none;font-size:11px;color:var(--red)">⚠ 300gを超えています</span>
                   </div>
+                  <div class="field full"><label>内容</label><input id="si-lu" placeholder="例：定食"></div>
                   <div class="field"><label>写真</label><input type="file" id="si-lu-img" accept="image/*" onchange="previewMeal(this,'si-lu-preview')" style="font-size:12px;padding:5px"></div>
                 </div>
                 <img id="si-lu-preview" src="" style="display:none;max-width:100%;max-height:160px;border-radius:var(--r);margin-top:6px;object-fit:cover">
@@ -273,11 +275,12 @@ button:active{transform:scale(0.98)}
               <div class="meal-block">
                 <div style="font-size:12px;font-weight:500;color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-moon-2" style="color:#534AB7"></i>夕食</div>
                 <div class="grid2">
-                  <div class="field full"><label>内容</label><input id="si-di" placeholder="例：鍋"></div>
+                  <div class="field"><label>食事時間</label><input id="si-di-t" type="time"></div>
                   <div class="field"><label>食事量 (g) <span style="color:var(--tx3);font-size:10px">上限300g</span></label>
                     <input id="si-di-g" type="number" min="0" max="300" placeholder="300" oninput="checkMealAmount(this,'si-di-warn')">
                     <span id="si-di-warn" style="display:none;font-size:11px;color:var(--red)">⚠ 300gを超えています</span>
                   </div>
+                  <div class="field full"><label>内容</label><input id="si-di" placeholder="例：鍋"></div>
                   <div class="field"><label>写真</label><input type="file" id="si-di-img" accept="image/*" onchange="previewMeal(this,'si-di-preview')" style="font-size:12px;padding:5px"></div>
                 </div>
                 <img id="si-di-preview" src="" style="display:none;max-width:100%;max-height:160px;border-radius:var(--r);margin-top:6px;object-fit:cover">
@@ -287,6 +290,8 @@ button:active{transform:scale(0.98)}
           <div class="card">
             <div class="card-title"><i class="ti ti-run" style="color:var(--amber)"></i>運動・その他</div>
             <div class="grid2">
+              <div class="field"><label>排尿回数</label><input id="si-ur" type="number" min="0" placeholder="例：6"></div>
+              <div class="field"><label>排便回数</label><input id="si-st" type="number" min="0" placeholder="例：1"></div>
               <div class="field"><label>外食</label><select id="si-eo"><option>なし</option><option>あり</option></select></div>
               <div class="field"><label>運動</label><input id="si-ex" placeholder="ウォーキング30分"></div>
               <div class="field full"><label>コメント</label><textarea id="si-cm" rows="3" placeholder="体調の変化、気づきなど..."></textarea></div>
@@ -369,6 +374,37 @@ button:active{transform:scale(0.98)}
           <div class="big-metric-delta muted">kg</div>
         </div>
       </div>
+      <!-- 前日夜→当日朝の増減 -->
+      <div style="background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rlg);padding:14px;margin-bottom:10px">
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:8px;font-weight:500">🌙 前日の夜 → 今朝の増減</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--tx3)">前日夜</div>
+            <div style="font-size:18px;font-weight:500" id="cl-prev-eve">—</div>
+          </div>
+          <div style="font-size:20px;color:var(--tx3)">→</div>
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--tx3)">今朝</div>
+            <div style="font-size:18px;font-weight:500" id="cl-this-morn">—</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:11px;color:var(--tx3)">増減</div>
+            <div style="font-size:20px;font-weight:500" id="cl-overnight-delta">—</div>
+          </div>
+        </div>
+      </div>
+      <!-- 今日の合計摂取量 -->
+      <div style="background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rlg);padding:14px;margin-bottom:10px">
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:8px;font-weight:500">🍽 今日の合計摂取量</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="flex:1">
+            <div class="progress-bar" style="height:10px;margin:0"><div id="cl-intake-bar" class="progress-fill" style="width:0%;background:var(--amber)"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-top:4px"><span>0g</span><span>上限900g</span></div>
+          </div>
+          <div style="font-size:22px;font-weight:500;min-width:70px;text-align:right" id="cl-intake-total">—</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;font-size:11px;color:var(--tx2)" id="cl-intake-detail"></div>
+      </div>
       <div style="background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rlg);padding:14px;margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--tx2);margin-bottom:6px">
           <span>目標進捗</span><span id="cl-prog-pct">0%</span>
@@ -407,33 +443,42 @@ button:active{transform:scale(0.98)}
       <!-- 朝食 -->
       <div style="background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rlg);padding:14px;margin-bottom:10px">
         <div style="font-size:12px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-sun" style="color:#BA7517"></i>朝食</div>
-        <div class="field"><label>内容</label><input id="ci-bf" placeholder="例：白米、卵、味噌汁"></div>
-        <div class="field"><label>食事量 (g) <span style="color:var(--tx3);font-size:10px">上限300g</span></label>
-          <input id="ci-bf-g" type="number" min="0" max="300" inputmode="numeric" placeholder="300" oninput="checkMealAmount(this,'ci-bf-warn')">
-          <span id="ci-bf-warn" style="display:none;font-size:11px;color:var(--red)">⚠ 300gを超えています</span>
+        <div class="grid2">
+          <div class="field"><label>食事時間</label><input id="ci-bf-t" type="time"></div>
+          <div class="field"><label>食事量 (g) <span style="color:var(--tx3);font-size:10px">上限300g</span></label>
+            <input id="ci-bf-g" type="number" min="0" max="300" inputmode="numeric" placeholder="300" oninput="checkMealAmount(this,'ci-bf-warn')">
+            <span id="ci-bf-warn" style="display:none;font-size:11px;color:var(--red)">⚠ 300gを超えています</span>
+          </div>
         </div>
+        <div class="field"><label>内容</label><input id="ci-bf" placeholder="例：白米、卵、味噌汁"></div>
         <div class="field"><label>写真</label><input type="file" id="ci-bf-img" accept="image/*" capture="environment" onchange="previewMeal(this,'ci-bf-preview')" style="font-size:13px;padding:6px"></div>
         <img id="ci-bf-preview" src="" style="display:none;width:100%;max-height:200px;border-radius:var(--r);margin-top:6px;object-fit:cover">
       </div>
       <!-- 昼食 -->
       <div style="background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rlg);padding:14px;margin-bottom:10px">
         <div style="font-size:12px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-clock" style="color:#185FA5"></i>昼食</div>
-        <div class="field"><label>内容</label><input id="ci-lu" placeholder="例：定食"></div>
-        <div class="field"><label>食事量 (g) <span style="color:var(--tx3);font-size:10px">上限300g</span></label>
-          <input id="ci-lu-g" type="number" min="0" max="300" inputmode="numeric" placeholder="300" oninput="checkMealAmount(this,'ci-lu-warn')">
-          <span id="ci-lu-warn" style="display:none;font-size:11px;color:var(--red)">⚠ 300gを超えています</span>
+        <div class="grid2">
+          <div class="field"><label>食事時間</label><input id="ci-lu-t" type="time"></div>
+          <div class="field"><label>食事量 (g) <span style="color:var(--tx3);font-size:10px">上限300g</span></label>
+            <input id="ci-lu-g" type="number" min="0" max="300" inputmode="numeric" placeholder="300" oninput="checkMealAmount(this,'ci-lu-warn')">
+            <span id="ci-lu-warn" style="display:none;font-size:11px;color:var(--red)">⚠ 300gを超えています</span>
+          </div>
         </div>
+        <div class="field"><label>内容</label><input id="ci-lu" placeholder="例：定食"></div>
         <div class="field"><label>写真</label><input type="file" id="ci-lu-img" accept="image/*" capture="environment" onchange="previewMeal(this,'ci-lu-preview')" style="font-size:13px;padding:6px"></div>
         <img id="ci-lu-preview" src="" style="display:none;width:100%;max-height:200px;border-radius:var(--r);margin-top:6px;object-fit:cover">
       </div>
       <!-- 夕食 -->
       <div style="background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rlg);padding:14px;margin-bottom:14px">
         <div style="font-size:12px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-moon-2" style="color:#534AB7"></i>夕食</div>
-        <div class="field"><label>内容</label><input id="ci-di" placeholder="例：鍋"></div>
-        <div class="field"><label>食事量 (g) <span style="color:var(--tx3);font-size:10px">上限300g</span></label>
-          <input id="ci-di-g" type="number" min="0" max="300" inputmode="numeric" placeholder="300" oninput="checkMealAmount(this,'ci-di-warn')">
-          <span id="ci-di-warn" style="display:none;font-size:11px;color:var(--red)">⚠ 300gを超えています</span>
+        <div class="grid2">
+          <div class="field"><label>食事時間</label><input id="ci-di-t" type="time"></div>
+          <div class="field"><label>食事量 (g) <span style="color:var(--tx3);font-size:10px">上限300g</span></label>
+            <input id="ci-di-g" type="number" min="0" max="300" inputmode="numeric" placeholder="300" oninput="checkMealAmount(this,'ci-di-warn')">
+            <span id="ci-di-warn" style="display:none;font-size:11px;color:var(--red)">⚠ 300gを超えています</span>
+          </div>
         </div>
+        <div class="field"><label>内容</label><input id="ci-di" placeholder="例：鍋"></div>
         <div class="field"><label>写真</label><input type="file" id="ci-di-img" accept="image/*" capture="environment" onchange="previewMeal(this,'ci-di-preview')" style="font-size:13px;padding:6px"></div>
         <img id="ci-di-preview" src="" style="display:none;width:100%;max-height:200px;border-radius:var(--r);margin-top:6px;object-fit:cover">
       </div>
@@ -488,7 +533,7 @@ async function load(){
       sbFetch('logs?select=*&order=date.asc'),
     ]);
     clients=cs.map(r=>({id:r.id,name:r.name,age:r.age,height:r.height,startWeight:r.start_weight,goalWeight:r.goal_weight,loginId:r.login_id,loginPw:r.login_pw,staff:r.staff,createdAt:r.created_at}));
-    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepQuality:r.sleep_quality,water:r.water,breakfast:r.breakfast,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,exercise:r.exercise,comment:r.comment}));
+    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepQuality:r.sleep_quality,water:r.water,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
   } catch(e){console.error('load error',e);clients=[];logs=[];}
   try{session=JSON.parse(localStorage.getItem(S_SESSION)||'null');}catch(e){session=null;}
 }
@@ -501,7 +546,7 @@ async function saveClientToDb(c){
 
 /* ===== 日報保存 ===== */
 async function saveLogToDb(l){
-  const row={id:l.id,client_id:l.clientId,date:l.date,morning:l.morning,evening:l.evening,sleep_quality:l.sleepQuality,water:l.water,breakfast:l.breakfast,breakfast_g:l.breakfastG,breakfast_img:l.breakfastImg,lunch:l.lunch,lunch_g:l.lunchG,lunch_img:l.lunchImg,dinner:l.dinner,dinner_g:l.dinnerG,dinner_img:l.dinnerImg,exercise:l.exercise,comment:l.comment};
+  const row={id:l.id,client_id:l.clientId,date:l.date,morning:l.morning,evening:l.evening,sleep_quality:l.sleepQuality,water:l.water,breakfast:l.breakfast,breakfast_time:l.breakfastTime,breakfast_g:l.breakfastG,breakfast_img:l.breakfastImg,lunch:l.lunch,lunch_time:l.lunchTime,lunch_g:l.lunchG,lunch_img:l.lunchImg,dinner:l.dinner,dinner_time:l.dinnerTime,dinner_g:l.dinnerG,dinner_img:l.dinnerImg,urine_count:l.urineCount,stool_count:l.stoolCount,exercise:l.exercise,comment:l.comment};
   await sbFetch('logs?on_conflict=id','POST',[row]);
 }
 
@@ -738,14 +783,19 @@ async function saveLog(role){
     sleepQuality:document.getElementById(`${p}-sq`).value,
     water:document.getElementById(`${p}-wt`).value,
     breakfast:document.getElementById(`${p}-bf`).value,
+    breakfastTime:document.getElementById(`${p}-bf-t`)?.value||null,
     breakfastG:parseInt(document.getElementById(`${p}-bf-g`)?.value)||null,
     breakfastImg:bfImg||existing?.breakfastImg||null,
     lunch:document.getElementById(`${p}-lu`).value,
+    lunchTime:document.getElementById(`${p}-lu-t`)?.value||null,
     lunchG:parseInt(document.getElementById(`${p}-lu-g`)?.value)||null,
     lunchImg:luImg||existing?.lunchImg||null,
     dinner:document.getElementById(`${p}-di`).value,
+    dinnerTime:document.getElementById(`${p}-di-t`)?.value||null,
     dinnerG:parseInt(document.getElementById(`${p}-di-g`)?.value)||null,
     dinnerImg:diImg||existing?.dinnerImg||null,
+    urineCount:parseInt(document.getElementById(`${p}-ur`)?.value)||null,
+    stoolCount:parseInt(document.getElementById(`${p}-st`)?.value)||null,
     exercise:document.getElementById(`${p}-ex`).value,
     comment:document.getElementById(`${p}-cm`).value
   };
@@ -872,6 +922,38 @@ function buildClientHome(){
   document.getElementById('cl-prog-bar').style.width=prog+'%';
   document.getElementById('cl-start-w').textContent='開始 '+c.startWeight+'kg';
   document.getElementById('cl-goal-w').textContent='目標 '+c.goalWeight+'kg';
+
+  // 前日夜→当日朝の増減
+  const prev=ls[ls.length-2];
+  const prevEve=prev?.evening||null;
+  const thisMorn=last?.morning||null;
+  document.getElementById('cl-prev-eve').textContent=prevEve?prevEve+'kg':'—';
+  document.getElementById('cl-this-morn').textContent=thisMorn?thisMorn+'kg':'—';
+  if(prevEve&&thisMorn){
+    const od=+(thisMorn-prevEve).toFixed(2);
+    const el=document.getElementById('cl-overnight-delta');
+    el.textContent=(od<0?od:'+'+od)+'kg';
+    el.style.color=od<0?'var(--green)':'var(--red)';
+  } else {
+    document.getElementById('cl-overnight-delta').textContent='—';
+  }
+
+  // 今日の合計摂取量
+  const todayLog=ls.find(l=>l.date===today());
+  const bf=todayLog?.breakfastG||0;
+  const lu=todayLog?.lunchG||0;
+  const di=todayLog?.dinnerG||0;
+  const total=bf+lu+di;
+  const limit=900;
+  document.getElementById('cl-intake-total').textContent=total?total+'g':'—';
+  document.getElementById('cl-intake-bar').style.width=Math.min(100,Math.round(total/limit*100))+'%';
+  document.getElementById('cl-intake-bar').style.background=total>limit?'var(--red)':total>600?'var(--amber)':'var(--green)';
+  document.getElementById('cl-intake-detail').innerHTML=[
+    bf?`<span>🌅 朝 ${bf}g</span>`:'',
+    lu?`<span>☀️ 昼 ${lu}g</span>`:'',
+    di?`<span>🌙 夜 ${di}g</span>`:'',
+  ].filter(Boolean).join('<span style="color:var(--br2)">｜</span>')||'<span>まだ記録なし</span>';
+
   document.getElementById('cl-recent-logs').innerHTML=[...ls].reverse().slice(0,5).map((l,i,arr)=>{
     const prev=arr[i+1]; const d=prev?+(l.morning-prev.morning).toFixed(2):null;
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--br)">
