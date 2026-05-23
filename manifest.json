@@ -1,6 +1,6 @@
 {
-  "name": "BodyLog",
-  "short_name": "BodyLog",
+  "name": "こころぎ体重管理",
+  "short_name": "こころぎ体重管理",
   "description": "ダイエット管理システム",
   "start_url": "/cocobody/diet_app_v2.html",
   "display": "standalone",
