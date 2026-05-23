@@ -1015,9 +1015,10 @@ function buildClientHistory(){
   }
 })();
 
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/cocobody/sw.js').catch(e=>console.log('SW error',e));
-}
+// Service Worker一時無効化中
+// if('serviceWorker' in navigator){
+//   navigator.serviceWorker.register('/cocobody/sw.js').catch(e=>console.log('SW error',e));
+// }
 </script>
 </body>
 </html>
