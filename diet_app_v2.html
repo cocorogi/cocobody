@@ -220,6 +220,10 @@ button:active{transform:scale(0.98)}
         <div id="staff-input-form" class="hidden">
           <div class="notif" id="staff-save-notif" style="display:none"><i class="ti ti-check"></i>保存しました</div>
           <div class="card">
+            <div class="card-title"><i class="ti ti-calendar" style="color:var(--green)"></i>記録日</div>
+            <div class="field"><label>日付（過去の日付も選択可）</label><input id="si-date" type="date"></div>
+          </div>
+          <div class="card">
             <div class="card-title"><i class="ti ti-scale" style="color:var(--green)"></i>体重</div>
             <div class="grid2">
               <div class="field"><label>朝体重 (kg)*</label><input id="si-m" type="number" step="0.1"></div>
@@ -424,6 +428,8 @@ button:active{transform:scale(0.98)}
   <div class="client-page" id="cp-input">
     <div style="padding-top:8px">
       <div class="notif" id="cl-save-notif" style="display:none"><i class="ti ti-check"></i>記録を保存しました！</div>
+      <div class="section-label">記録日</div>
+      <div class="field" style="margin-bottom:14px"><label>日付（過去の日付も選択可）</label><input id="ci-date" type="date"></div>
       <div class="section-label">体重</div>
       <div class="grid2" style="margin-bottom:14px">
         <div class="field"><label>朝体重 (kg)*</label><input id="ci-m" type="number" step="0.1" inputmode="decimal"></div>
@@ -638,6 +644,8 @@ function enterStaff(){
   document.getElementById('screen-staff').style.display='block';
   document.getElementById('screen-client').style.display='none';
   document.getElementById('staff-name-display').textContent=session.name;
+  const dateEl=document.getElementById('si-date');
+  if(dateEl) dateEl.value=today();
   renderSidebarClients();
   buildDashboard();
   if(clients.length) selectClient(clients[0].id,'staff');
@@ -796,15 +804,16 @@ async function saveLog(role){
   const morning=parseFloat(document.getElementById(`${p}-m`).value);
   if(isNaN(morning)){toast('朝体重を入力してください');return;}
   if(hasMealOverLimit(p)){if(!confirm('300gを超えている食事があります。このまま保存しますか？'))return;}
+  const dateInput=document.getElementById(`${p}-date`)?.value||today();
   const [bfImg,luImg,diImg]=await Promise.all([
     readFileAsBase64(`${p}-bf-img`),
     readFileAsBase64(`${p}-lu-img`),
     readFileAsBase64(`${p}-di-img`),
   ]);
-  const existing=logs.find(l=>l.clientId===currentClientId&&l.date===today());
+  const existing=logs.find(l=>l.clientId===currentClientId&&l.date===dateInput);
   const log={
     id:existing?existing.id:'l_'+Date.now(),
-    clientId:currentClientId, date:today(), morning,
+    clientId:currentClientId, date:dateInput, morning,
     evening:parseFloat(document.getElementById(`${p}-e`).value)||null,
     sleepQuality:document.getElementById(`${p}-sq`).value,
     water:document.getElementById(`${p}-wt`).value,
@@ -825,10 +834,9 @@ async function saveLog(role){
     exercise:document.getElementById(`${p}-ex`).value,
     comment:document.getElementById(`${p}-cm`).value
   };
-  if(existing){if(!confirm('今日の記録があります。上書きしますか？'))return;}
+  if(existing){if(!confirm(`${dateInput}の記録があります。上書きしますか？`))return;}
   try{
     await saveLogToDb(log, !!existing);
-    // Supabaseから最新データを再読み込み
     const ls=await sbFetch('logs?select=*&order=date.asc');
     logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepQuality:r.sleep_quality,water:r.water,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
     toast('保存しました');
@@ -836,6 +844,19 @@ async function saveLog(role){
     nel.style.display='flex'; setTimeout(()=>nel.style.display='none',3000);
     if(!isStaff)buildClientHome();
   }catch(e){toast('保存エラー: '+e.message);}
+}
+
+/* ===== 日報削除 ===== */
+async function deleteLog(logId){
+  if(!confirm('この記録を削除しますか？'))return;
+  try{
+    await sbFetch(`logs?id=eq.${logId}`,'DELETE');
+    const ls=await sbFetch('logs?select=*&order=date.asc');
+    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepQuality:r.sleep_quality,water:r.water,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
+    toast('削除しました');
+    buildReport();
+    buildClientHistory();
+  }catch(e){toast('削除エラー: '+e.message);}
 }
 function clearStaffInput(){
   ['si-m','si-e','si-bf','si-bf-g','si-lu','si-lu-g','si-di','si-di-g','si-ex','si-cm'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -918,8 +939,8 @@ function buildReport(){
     <div class="metric"><div class="metric-label">記録日数</div><div class="metric-value">${ls.length}</div><div class="metric-delta muted">日</div></div>`;
   document.getElementById('report-logs').innerHTML=[...ls].reverse().map((l,i,arr)=>{
     const prev=arr[i+1]; const d=prev?+(l.morning-prev.morning).toFixed(2):null;
-    return `<tr><td style="color:var(--tx2)">${fmtDate(l.date)}</td><td style="font-weight:500">${l.morning}kg</td><td style="color:${d===null?'var(--tx2)':d<0?'var(--green)':'var(--red)'}">${d===null?'—':(d<0?d:'+'+d)+'kg'}</td><td style="color:var(--tx2);max-width:100px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${l.comment||'—'}</td></tr>`;
-  }).join('')||'<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--tx3)">記録がありません</td></tr>';
+    return `<tr><td style="color:var(--tx2)">${fmtDate(l.date)}</td><td style="font-weight:500">${l.morning}kg</td><td style="color:${d===null?'var(--tx2)':d<0?'var(--green)':'var(--red)'}">${d===null?'—':(d<0?d:'+'+d)+'kg'}</td><td style="color:var(--tx2);max-width:80px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${l.comment||'—'}</td><td><button onclick="deleteLog('${l.id}')" style="padding:3px 8px;font-size:11px;color:var(--red);border-color:var(--red)"><i class="ti ti-trash"></i></button></td></tr>`;
+  }).join('')||'<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--tx3)">記録がありません</td></tr>';
   document.getElementById('report-comments').innerHTML=[...ls].filter(l=>l.comment).reverse().slice(0,6).map(l=>`
     <div style="padding:8px 0;border-bottom:0.5px solid var(--br)"><div style="font-size:11px;color:var(--tx2);margin-bottom:3px">${fmtDate(l.date)} — ${l.morning}kg</div><div style="font-size:12px">${l.comment}</div></div>`).join('')||'<div class="empty">コメントはありません</div>';
   buildStaffChart(ls,c);
@@ -1019,7 +1040,10 @@ function buildClientHistory(){
     return `<div style="background:var(--bg);border:0.5px solid var(--br);border-radius:var(--rlg);padding:12px 14px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
         <span style="font-weight:500">${fmtDate(l.date)}</span>
-        <span style="font-size:18px;font-weight:500">${l.morning}kg <span style="font-size:12px;color:${d===null?'var(--tx2)':d<0?'var(--green)':'var(--red)'}">${d===null?'':( d<0?d:'+'+d)+'kg'}</span></span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px;font-weight:500">${l.morning}kg <span style="font-size:12px;color:${d===null?'var(--tx2)':d<0?'var(--green)':'var(--red)'}">${d===null?'':( d<0?d:'+'+d)+'kg'}</span></span>
+          <button onclick="deleteLog('${l.id}')" style="padding:3px 8px;font-size:11px;color:var(--red);border-color:var(--red)"><i class="ti ti-trash"></i></button>
+        </div>
       </div>
       ${l.comment?`<div style="font-size:12px;color:var(--tx2);margin-bottom:4px">${l.comment}</div>`:''}
       ${mealRow('朝食','🌅',l.breakfast,l.breakfastG,l.breakfastImg)}
