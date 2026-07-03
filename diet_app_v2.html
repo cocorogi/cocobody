@@ -541,9 +541,13 @@ async function saveClientToDb(c){
 }
 
 /* ===== 日報保存 ===== */
-async function saveLogToDb(l){
+async function saveLogToDb(l, isExisting=false){
   const row={id:l.id,client_id:l.clientId,date:l.date,morning:l.morning,evening:l.evening,sleep_quality:l.sleepQuality,water:l.water,breakfast:l.breakfast,breakfast_time:l.breakfastTime,breakfast_g:l.breakfastG,breakfast_img:l.breakfastImg,lunch:l.lunch,lunch_time:l.lunchTime,lunch_g:l.lunchG,lunch_img:l.lunchImg,dinner:l.dinner,dinner_time:l.dinnerTime,dinner_g:l.dinnerG,dinner_img:l.dinnerImg,urine_count:l.urineCount,stool_count:l.stoolCount,exercise:l.exercise,comment:l.comment};
-  await sbFetch('logs?on_conflict=id','POST',[row],true);
+  if(isExisting){
+    await sbFetch(`logs?id=eq.${l.id}`,'PATCH',row);
+  } else {
+    await sbFetch('logs','POST',[row]);
+  }
 }
 
 /* ===== 削除 ===== */
@@ -823,7 +827,7 @@ async function saveLog(role){
   };
   if(existing){if(!confirm('今日の記録があります。上書きしますか？'))return;}
   try{
-    await saveLogToDb(log);
+    await saveLogToDb(log, !!existing);
     // Supabaseから最新データを再読み込み
     const ls=await sbFetch('logs?select=*&order=date.asc');
     logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepQuality:r.sleep_quality,water:r.water,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
