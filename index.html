@@ -233,7 +233,7 @@ button:active{transform:scale(0.98)}
           <div class="card">
             <div class="card-title"><i class="ti ti-moon" style="color:#534AB7"></i>睡眠・水分</div>
             <div class="grid2">
-              <div class="field"><label>就寝</label><select id="si-sl"><option>22時台</option><option>23時台</option><option>24時台</option><option>25時以降</option></select></div>
+              <div class="field"><label>就寝</label><select id="si-sl"><option>21時台</option><option>22時台</option><option>23時台</option><option>24時台</option><option>25時以降</option></select></div>
               <div class="field"><label>起床</label><select id="si-wk"><option>5時台</option><option>6時台</option><option>7時台</option><option>8時以降</option></select></div>
               <div class="field"><label>睡眠の質</label><select id="si-sq"><option>ぐっすり</option><option>途中目が覚めた</option><option>眠れなかった</option></select></div>
               <div class="field"><label>水分量</label><select id="si-wt"><option>500ml未満</option><option>500ml〜1L</option><option>1L〜1.5L</option><option>1.5L〜2L</option><option>2L以上</option></select></div>
@@ -291,6 +291,8 @@ button:active{transform:scale(0.98)}
             <div class="grid2">
               <div class="field"><label>排尿回数</label><input id="si-ur" type="number" min="0" placeholder="例：6"></div>
               <div class="field"><label>排便回数</label><input id="si-st" type="number" min="0" placeholder="例：1"></div>
+              <div class="field"><label>飲酒</label><select id="si-alc"><option>なし</option><option>あり</option></select></div>
+              <div class="field"><label>生理</label><select id="si-men"><option>なし</option><option>生理前</option><option>生理中</option><option>生理終わり</option></select></div>
               <div class="field"><label>外食</label><select id="si-eo"><option>なし</option><option>あり</option></select></div>
               <div class="field"><label>運動</label><input id="si-ex" placeholder="ウォーキング30分"></div>
               <div class="field full"><label>コメント</label><textarea id="si-cm" rows="3" placeholder="体調の変化、気づきなど..."></textarea></div>
@@ -437,8 +439,11 @@ button:active{transform:scale(0.98)}
       </div>
       <div class="section-label">睡眠・水分</div>
       <div class="grid2" style="margin-bottom:14px">
+        <div class="field"><label>就寝</label><select id="ci-sl"><option>21時台</option><option>22時台</option><option>23時台</option><option>24時台</option><option>25時以降</option></select></div>
         <div class="field"><label>睡眠の質</label><select id="ci-sq"><option>ぐっすり</option><option>途中目が覚めた</option><option>眠れなかった</option></select></div>
         <div class="field"><label>水分量</label><select id="ci-wt"><option>500ml未満</option><option>500ml〜1L</option><option>1L〜1.5L</option><option>1.5L〜2L</option><option>2L以上</option></select></div>
+        <div class="field"><label>飲酒</label><select id="ci-alc"><option>なし</option><option>あり</option></select></div>
+        <div class="field full"><label>生理</label><select id="ci-men"><option>なし</option><option>生理前</option><option>生理中</option><option>生理終わり</option></select></div>
       </div>
       <div class="section-label">食事</div>
       <!-- 朝食 -->
@@ -535,7 +540,7 @@ async function load(){
       sbFetch('logs?select=*&order=date.asc'),
     ]);
     clients=cs.map(r=>({id:r.id,name:r.name,age:r.age,height:r.height,startWeight:r.start_weight,goalWeight:r.goal_weight,loginId:r.login_id,loginPw:r.login_pw,loginPwHash:r.login_pw_hash,staff:r.staff,createdAt:r.created_at}));
-    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepQuality:r.sleep_quality,water:r.water,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
+    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepTime:r.sleep_time,sleepQuality:r.sleep_quality,water:r.water,alcohol:r.alcohol,menstruation:r.menstruation,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
   } catch(e){console.error('load error',e);clients=[];logs=[];}
   try{session=JSON.parse(localStorage.getItem(S_SESSION)||'null');}catch(e){session=null;}
 }
@@ -548,7 +553,7 @@ async function saveClientToDb(c){
 
 /* ===== 日報保存 ===== */
 async function saveLogToDb(l, isExisting=false){
-  const row={id:l.id,client_id:l.clientId,date:l.date,morning:l.morning,evening:l.evening,sleep_quality:l.sleepQuality,water:l.water,breakfast:l.breakfast,breakfast_time:l.breakfastTime,breakfast_g:l.breakfastG,breakfast_img:l.breakfastImg,lunch:l.lunch,lunch_time:l.lunchTime,lunch_g:l.lunchG,lunch_img:l.lunchImg,dinner:l.dinner,dinner_time:l.dinnerTime,dinner_g:l.dinnerG,dinner_img:l.dinnerImg,urine_count:l.urineCount,stool_count:l.stoolCount,exercise:l.exercise,comment:l.comment};
+  const row={id:l.id,client_id:l.clientId,date:l.date,morning:l.morning,evening:l.evening,sleep_time:l.sleepTime,sleep_quality:l.sleepQuality,water:l.water,alcohol:l.alcohol,menstruation:l.menstruation,breakfast:l.breakfast,breakfast_time:l.breakfastTime,breakfast_g:l.breakfastG,breakfast_img:l.breakfastImg,lunch:l.lunch,lunch_time:l.lunchTime,lunch_g:l.lunchG,lunch_img:l.lunchImg,dinner:l.dinner,dinner_time:l.dinnerTime,dinner_g:l.dinnerG,dinner_img:l.dinnerImg,urine_count:l.urineCount,stool_count:l.stoolCount,exercise:l.exercise,comment:l.comment};
   if(isExisting){
     await sbFetch(`logs?id=eq.${l.id}`,'PATCH',row);
   } else {
@@ -810,13 +815,18 @@ async function saveLog(role){
     readFileAsBase64(`${p}-lu-img`),
     readFileAsBase64(`${p}-di-img`),
   ]);
-  const existing=logs.find(l=>l.clientId===currentClientId&&l.date===dateInput);
+  // Supabaseから直接その日の記録を確認
+  const existingArr=await sbFetch(`logs?client_id=eq.${currentClientId}&date=eq.${dateInput}&select=*`);
+  const existing=existingArr.length?existingArr[0]:null;
   const log={
     id:existing?existing.id:'l_'+Date.now(),
     clientId:currentClientId, date:dateInput, morning,
     evening:parseFloat(document.getElementById(`${p}-e`).value)||null,
+    sleepTime:document.getElementById(`${p}-sl`)?.value||null,
     sleepQuality:document.getElementById(`${p}-sq`).value,
     water:document.getElementById(`${p}-wt`).value,
+    alcohol:document.getElementById(`${p}-alc`)?.value||null,
+    menstruation:document.getElementById(`${p}-men`)?.value||null,
     breakfast:document.getElementById(`${p}-bf`).value,
     breakfastTime:document.getElementById(`${p}-bf-t`)?.value||null,
     breakfastG:parseInt(document.getElementById(`${p}-bf-g`)?.value)||null,
@@ -838,7 +848,7 @@ async function saveLog(role){
   try{
     await saveLogToDb(log, !!existing);
     const ls=await sbFetch('logs?select=*&order=date.asc');
-    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepQuality:r.sleep_quality,water:r.water,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
+    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepTime:r.sleep_time,sleepQuality:r.sleep_quality,water:r.water,alcohol:r.alcohol,menstruation:r.menstruation,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
     toast('保存しました');
     const nel=document.getElementById(isStaff?'staff-save-notif':'cl-save-notif');
     nel.style.display='flex'; setTimeout(()=>nel.style.display='none',3000);
@@ -852,7 +862,7 @@ async function deleteLog(logId){
   try{
     await sbFetch(`logs?id=eq.${logId}`,'DELETE');
     const ls=await sbFetch('logs?select=*&order=date.asc');
-    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepQuality:r.sleep_quality,water:r.water,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
+    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepTime:r.sleep_time,sleepQuality:r.sleep_quality,water:r.water,alcohol:r.alcohol,menstruation:r.menstruation,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
     toast('削除しました');
     buildReport();
     buildClientHistory();
