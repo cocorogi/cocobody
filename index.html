@@ -291,6 +291,9 @@ button:active{transform:scale(0.98)}
             <div class="grid2">
               <div class="field"><label>排尿回数</label><input id="si-ur" type="number" min="0" placeholder="例：6"></div>
               <div class="field"><label>排便回数</label><input id="si-st" type="number" min="0" placeholder="例：1"></div>
+              <div class="field full"><label>排便の出方</label><select id="si-stt"><option>なし</option><option>スッキリバナナ</option><option>少なめ</option><option>軟便</option><option>コロコロ</option></select></div>
+              <div class="field"><label>ウエスト (cm)</label><input id="si-waist" type="number" step="0.1" placeholder="例：75.0"></div>
+              <div class="field"><label>へそ周囲 (cm)</label><input id="si-navel" type="number" step="0.1" placeholder="例：80.0"></div>
               <div class="field"><label>飲酒</label><select id="si-alc"><option>なし</option><option>あり</option></select></div>
               <div class="field"><label>生理</label><select id="si-men"><option>なし</option><option>生理前</option><option>生理中</option><option>生理終わり</option></select></div>
               <div class="field"><label>外食</label><select id="si-eo"><option>なし</option><option>あり</option></select></div>
@@ -318,12 +321,24 @@ button:active{transform:scale(0.98)}
         </div>
         <div class="metrics4" id="report-metrics"></div>
         <div class="card"><div class="card-title"><i class="ti ti-chart-line" style="color:var(--green)"></i>体重推移</div><div class="chart-wrap"><canvas id="staffWeightChart"></canvas></div></div>
+        <div class="card"><div class="card-title"><i class="ti ti-ruler" style="color:var(--blue)"></i>ウエスト・へそ周囲推移</div><div class="chart-wrap"><canvas id="waistChart"></canvas></div></div>
         <div class="grid2">
           <div class="card">
             <div class="card-title"><i class="ti ti-list" style="color:var(--green)"></i>日別記録</div>
             <div style="max-height:280px;overflow-y:auto"><table class="log-table"><thead><tr><th>日付</th><th>朝体重</th><th>変化</th><th>コメント</th></tr></thead><tbody id="report-logs"></tbody></table></div>
           </div>
           <div class="card"><div class="card-title"><i class="ti ti-message" style="color:var(--blue)"></i>最近のコメント</div><div id="report-comments"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-table" style="color:var(--tx2)"></i>全項目日別一覧</div>
+          <div style="overflow-x:auto">
+            <table class="log-table" style="min-width:900px">
+              <thead><tr>
+                <th>日付</th><th>朝体重</th><th>夜体重</th><th>ウエスト</th><th>へそ周囲</th><th>睡眠</th><th>水分</th><th>排尿</th><th>排便</th><th>排便の出方</th><th>飲酒</th><th>生理</th><th>運動</th><th>朝食</th><th>昼食</th><th>夕食</th><th>コメント</th>
+              </tr></thead>
+              <tbody id="report-all-logs"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -489,6 +504,11 @@ button:active{transform:scale(0.98)}
         <img id="ci-di-preview" src="" style="display:none;width:100%;max-height:200px;border-radius:var(--r);margin-top:6px;object-fit:cover">
       </div>
       <div class="section-label">運動・コメント</div>
+      <div class="grid2" style="margin-bottom:10px">
+        <div class="field"><label>排便の出方</label><select id="ci-stt"><option>なし</option><option>スッキリバナナ</option><option>少なめ</option><option>軟便</option><option>コロコロ</option></select></div>
+        <div class="field"><label>ウエスト (cm)</label><input id="ci-waist" type="number" step="0.1" inputmode="decimal" placeholder="例：75.0"></div>
+        <div class="field"><label>へそ周囲 (cm)</label><input id="ci-navel" type="number" step="0.1" inputmode="decimal" placeholder="例：80.0"></div>
+      </div>
       <div class="field" style="margin-bottom:8px"><label>今日の運動</label><input id="ci-ex" placeholder="ウォーキング30分など"></div>
       <div class="field" style="margin-bottom:16px"><label>今日の気持ち・コメント</label><textarea id="ci-cm" rows="3" placeholder="体調の変化、気づきなど..."></textarea></div>
       <button class="btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:15px" onclick="saveLog('client')"><i class="ti ti-device-floppy"></i>今日の記録を保存する</button>
@@ -540,7 +560,7 @@ async function load(){
       sbFetch('logs?select=*&order=date.asc'),
     ]);
     clients=cs.map(r=>({id:r.id,name:r.name,age:r.age,height:r.height,startWeight:r.start_weight,goalWeight:r.goal_weight,loginId:r.login_id,loginPw:r.login_pw,loginPwHash:r.login_pw_hash,staff:r.staff,createdAt:r.created_at}));
-    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepTime:r.sleep_time,sleepQuality:r.sleep_quality,water:r.water,alcohol:r.alcohol,menstruation:r.menstruation,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
+    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepTime:r.sleep_time,sleepQuality:r.sleep_quality,water:r.water,alcohol:r.alcohol,menstruation:r.menstruation,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,stoolType:r.stool_type,waist:r.waist,navel:r.navel,exercise:r.exercise,comment:r.comment}));
   } catch(e){console.error('load error',e);clients=[];logs=[];}
   try{session=JSON.parse(localStorage.getItem(S_SESSION)||'null');}catch(e){session=null;}
 }
@@ -553,7 +573,7 @@ async function saveClientToDb(c){
 
 /* ===== 日報保存 ===== */
 async function saveLogToDb(l, isExisting=false){
-  const row={id:l.id,client_id:l.clientId,date:l.date,morning:l.morning,evening:l.evening,sleep_time:l.sleepTime,sleep_quality:l.sleepQuality,water:l.water,alcohol:l.alcohol,menstruation:l.menstruation,breakfast:l.breakfast,breakfast_time:l.breakfastTime,breakfast_g:l.breakfastG,breakfast_img:l.breakfastImg,lunch:l.lunch,lunch_time:l.lunchTime,lunch_g:l.lunchG,lunch_img:l.lunchImg,dinner:l.dinner,dinner_time:l.dinnerTime,dinner_g:l.dinnerG,dinner_img:l.dinnerImg,urine_count:l.urineCount,stool_count:l.stoolCount,exercise:l.exercise,comment:l.comment};
+  const row={id:l.id,client_id:l.clientId,date:l.date,morning:l.morning,evening:l.evening,sleep_time:l.sleepTime,sleep_quality:l.sleepQuality,water:l.water,alcohol:l.alcohol,menstruation:l.menstruation,breakfast:l.breakfast,breakfast_time:l.breakfastTime,breakfast_g:l.breakfastG,breakfast_img:l.breakfastImg,lunch:l.lunch,lunch_time:l.lunchTime,lunch_g:l.lunchG,lunch_img:l.lunchImg,dinner:l.dinner,dinner_time:l.dinnerTime,dinner_g:l.dinnerG,dinner_img:l.dinnerImg,urine_count:l.urineCount,stool_count:l.stoolCount,stool_type:l.stoolType,waist:l.waist,navel:l.navel,exercise:l.exercise,comment:l.comment};
   if(isExisting){
     await sbFetch(`logs?id=eq.${l.id}`,'PATCH',row);
   } else {
@@ -841,6 +861,9 @@ async function saveLog(role){
     dinnerImg:diImg||existing?.dinnerImg||null,
     urineCount:parseInt(document.getElementById(`${p}-ur`)?.value)||null,
     stoolCount:parseInt(document.getElementById(`${p}-st`)?.value)||null,
+    stoolType:document.getElementById(`${p}-stt`)?.value||null,
+    waist:parseFloat(document.getElementById(`${p}-waist`)?.value)||null,
+    navel:parseFloat(document.getElementById(`${p}-navel`)?.value)||null,
     exercise:document.getElementById(`${p}-ex`).value,
     comment:document.getElementById(`${p}-cm`).value
   };
@@ -848,7 +871,7 @@ async function saveLog(role){
   try{
     await saveLogToDb(log, !!existing);
     const ls=await sbFetch('logs?select=*&order=date.asc');
-    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepTime:r.sleep_time,sleepQuality:r.sleep_quality,water:r.water,alcohol:r.alcohol,menstruation:r.menstruation,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
+    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepTime:r.sleep_time,sleepQuality:r.sleep_quality,water:r.water,alcohol:r.alcohol,menstruation:r.menstruation,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,stoolType:r.stool_type,waist:r.waist,navel:r.navel,exercise:r.exercise,comment:r.comment}));
     toast('保存しました');
     const nel=document.getElementById(isStaff?'staff-save-notif':'cl-save-notif');
     nel.style.display='flex'; setTimeout(()=>nel.style.display='none',3000);
@@ -862,7 +885,7 @@ async function deleteLog(logId){
   try{
     await sbFetch(`logs?id=eq.${logId}`,'DELETE');
     const ls=await sbFetch('logs?select=*&order=date.asc');
-    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepTime:r.sleep_time,sleepQuality:r.sleep_quality,water:r.water,alcohol:r.alcohol,menstruation:r.menstruation,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,exercise:r.exercise,comment:r.comment}));
+    logs=ls.map(r=>({id:r.id,clientId:r.client_id,date:r.date,morning:r.morning,evening:r.evening,sleepTime:r.sleep_time,sleepQuality:r.sleep_quality,water:r.water,alcohol:r.alcohol,menstruation:r.menstruation,breakfast:r.breakfast,breakfastTime:r.breakfast_time,breakfastG:r.breakfast_g,breakfastImg:r.breakfast_img,lunch:r.lunch,lunchTime:r.lunch_time,lunchG:r.lunch_g,lunchImg:r.lunch_img,dinner:r.dinner,dinnerTime:r.dinner_time,dinnerG:r.dinner_g,dinnerImg:r.dinner_img,urineCount:r.urine_count,stoolCount:r.stool_count,stoolType:r.stool_type,waist:r.waist,navel:r.navel,exercise:r.exercise,comment:r.comment}));
     toast('削除しました');
     buildReport();
     buildClientHistory();
@@ -953,7 +976,31 @@ function buildReport(){
   }).join('')||'<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--tx3)">記録がありません</td></tr>';
   document.getElementById('report-comments').innerHTML=[...ls].filter(l=>l.comment).reverse().slice(0,6).map(l=>`
     <div style="padding:8px 0;border-bottom:0.5px solid var(--br)"><div style="font-size:11px;color:var(--tx2);margin-bottom:3px">${fmtDate(l.date)} — ${l.morning}kg</div><div style="font-size:12px">${l.comment}</div></div>`).join('')||'<div class="empty">コメントはありません</div>';
+
+  // 全項目日別一覧
+  document.getElementById('report-all-logs').innerHTML=[...ls].reverse().map(l=>`
+    <tr>
+      <td style="color:var(--tx2);white-space:nowrap">${fmtDate(l.date)}</td>
+      <td style="font-weight:500">${l.morning}kg</td>
+      <td>${l.evening?l.evening+'kg':'—'}</td>
+      <td>${l.waist?l.waist+'cm':'—'}</td>
+      <td>${l.navel?l.navel+'cm':'—'}</td>
+      <td>${l.sleepQuality||'—'}</td>
+      <td>${l.water||'—'}</td>
+      <td>${l.urineCount||'—'}</td>
+      <td>${l.stoolCount||'—'}</td>
+      <td>${l.stoolType||'—'}</td>
+      <td>${l.alcohol||'—'}</td>
+      <td>${l.menstruation||'—'}</td>
+      <td style="max-width:80px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${l.exercise||'—'}</td>
+      <td style="max-width:80px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${l.breakfast||'—'}</td>
+      <td style="max-width:80px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${l.lunch||'—'}</td>
+      <td style="max-width:80px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${l.dinner||'—'}</td>
+      <td style="max-width:100px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${l.comment||'—'}</td>
+    </tr>`).join('')||'<tr><td colspan="17" style="text-align:center;padding:20px;color:var(--tx3)">記録がありません</td></tr>';
+
   buildStaffChart(ls,c);
+  buildWaistChart(ls);
 }
 function buildStaffChart(ls,c){
   if(staffChart){staffChart.destroy();staffChart=null;}
@@ -965,6 +1012,25 @@ function buildStaffChart(ls,c){
     {label:'夜体重',data:ls.map(l=>l.evening),borderColor:'#378ADD',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,tension:0.3,borderDash:[4,2]},
     {label:'目標',data:ls.map(()=>c.goalWeight),borderColor:'#E24B4A',backgroundColor:'transparent',borderWidth:1,borderDash:[6,3],pointRadius:0}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:11},color:tc,usePointStyle:true,boxWidth:20}}},scales:{x:{grid:{color:grid},ticks:{font:{size:10},color:tc,maxTicksLimit:8}},y:{grid:{color:grid},ticks:{font:{size:11},color:tc,callback:v=>v+'kg'}}}}});
+}
+
+let waistChart=null;
+function buildWaistChart(ls){
+  if(waistChart){waistChart.destroy();waistChart=null;}
+  const hasData=ls.some(l=>l.waist||l.navel);
+  if(!hasData){
+    const wrap=document.getElementById('waistChart');
+    if(wrap) wrap.parentElement.innerHTML='<div class="empty">ウエスト・へそ周囲のデータがありません</div>';
+    return;
+  }
+  const ctx=document.getElementById('waistChart')?.getContext('2d');
+  if(!ctx)return;
+  const dark=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  const grid=dark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)'; const tc=dark?'#6b6b66':'#888';
+  waistChart=new Chart(ctx,{type:'line',data:{labels:ls.map(l=>fmtDate(l.date)),datasets:[
+    {label:'ウエスト',data:ls.map(l=>l.waist||null),borderColor:'#BA7517',backgroundColor:'rgba(186,117,23,0.08)',borderWidth:2,pointRadius:3,tension:0.3,fill:true,spanGaps:true},
+    {label:'へそ周囲',data:ls.map(l=>l.navel||null),borderColor:'#534AB7',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,tension:0.3,borderDash:[4,2],spanGaps:true}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:11},color:tc,usePointStyle:true,boxWidth:20}}},scales:{x:{grid:{color:grid},ticks:{font:{size:10},color:tc,maxTicksLimit:8}},y:{grid:{color:grid},ticks:{font:{size:11},color:tc,callback:v=>v+'cm'}}}}});
 }
 
 /* ===== 顧客ホーム ===== */
