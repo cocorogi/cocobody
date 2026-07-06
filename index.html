@@ -1018,10 +1018,15 @@ let waistChart=null;
 function buildWaistChart(ls){
   if(waistChart){waistChart.destroy();waistChart=null;}
   const hasData=ls.some(l=>l.waist||l.navel);
+  const wrap=document.querySelector('#waistChart')?.closest('.card');
   if(!hasData){
-    const wrap=document.getElementById('waistChart');
-    if(wrap) wrap.parentElement.innerHTML='<div class="empty">ウエスト・へそ周囲のデータがありません</div>';
+    if(wrap) wrap.querySelector('.chart-wrap').innerHTML='<div class="empty">ウエスト・へそ周囲のデータがありません</div>';
     return;
+  }
+  // canvasが消えていたら再作成
+  let chartWrap=document.querySelector('#waistChart')?.closest('.chart-wrap');
+  if(!document.getElementById('waistChart')){
+    if(chartWrap){chartWrap.innerHTML='<canvas id="waistChart"></canvas>';}
   }
   const ctx=document.getElementById('waistChart')?.getContext('2d');
   if(!ctx)return;
