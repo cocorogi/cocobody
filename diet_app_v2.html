@@ -1011,11 +1011,27 @@ function buildStaffChart(ls,c){
   const ctx=document.getElementById('staffWeightChart').getContext('2d');
   const dark=window.matchMedia('(prefers-color-scheme:dark)').matches;
   const grid=dark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)'; const tc=dark?'#6b6b66':'#888';
-  staffChart=new Chart(ctx,{type:'line',data:{labels:ls.map(l=>fmtDate(l.date)),datasets:[
-    {label:'朝体重',data:ls.map(l=>l.morning),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',borderWidth:2,pointRadius:3,tension:0.3,fill:true},
-    {label:'夜体重',data:ls.map(l=>l.evening),borderColor:'#378ADD',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,tension:0.3,borderDash:[4,2]},
-    {label:'目標',data:ls.map(()=>c.goalWeight),borderColor:'#E24B4A',backgroundColor:'transparent',borderWidth:1,borderDash:[6,3],pointRadius:0}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:11},color:tc,usePointStyle:true,boxWidth:20}}},scales:{x:{grid:{color:grid},ticks:{font:{size:10},color:tc,maxTicksLimit:8}},y:{grid:{color:grid},ticks:{font:{size:11},color:tc,callback:v=>v+'kg'}}}}});
+  staffChart=new Chart(ctx,{
+    data:{
+      labels:ls.map(l=>fmtDate(l.date)),
+      datasets:[
+        {type:'line',label:'朝体重',data:ls.map(l=>l.morning),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',borderWidth:2,pointRadius:3,tension:0.3,fill:true,yAxisID:'y'},
+        {type:'line',label:'夜体重',data:ls.map(l=>l.evening),borderColor:'#378ADD',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,tension:0.3,borderDash:[4,2],yAxisID:'y'},
+        {type:'line',label:'目標',data:ls.map(()=>c.goalWeight),borderColor:'#E24B4A',backgroundColor:'transparent',borderWidth:1,borderDash:[6,3],pointRadius:0,yAxisID:'y'},
+        {type:'bar',label:'排尿回数',data:ls.map(l=>l.urineCount||null),backgroundColor:'rgba(24,95,165,0.3)',borderColor:'rgba(24,95,165,0.6)',borderWidth:1,yAxisID:'y2',barPercentage:0.4},
+        {type:'bar',label:'排便回数',data:ls.map(l=>l.stoolCount||null),backgroundColor:'rgba(186,117,23,0.35)',borderColor:'rgba(186,117,23,0.7)',borderWidth:1,yAxisID:'y2',barPercentage:0.4},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{size:11},color:tc,usePointStyle:true,boxWidth:20}}},
+      scales:{
+        x:{grid:{color:grid},ticks:{font:{size:10},color:tc,maxTicksLimit:8}},
+        y:{grid:{color:grid},ticks:{font:{size:11},color:tc,callback:v=>v+'kg'},position:'left'},
+        y2:{grid:{display:false},ticks:{font:{size:11},color:tc,stepSize:1,callback:v=>v+'回'},position:'right',min:0,max:Math.max(10,Math.max(...ls.map(l=>Math.max(l.urineCount||0,l.stoolCount||0)))+2)}
+      }
+    }
+  });
 }
 
 let waistChart=null;
