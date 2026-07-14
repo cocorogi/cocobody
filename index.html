@@ -503,11 +503,15 @@ button:active{transform:scale(0.98)}
         <div class="field"><label>写真</label><input type="file" id="ci-di-img" accept="image/*" capture="environment" onchange="previewMeal(this,'ci-di-preview')" style="font-size:13px;padding:6px"></div>
         <img id="ci-di-preview" src="" style="display:none;width:100%;max-height:200px;border-radius:var(--r);margin-top:6px;object-fit:cover">
       </div>
-      <div class="section-label">運動・コメント</div>
+      <div class="section-label">運動・その他</div>
       <div class="grid2" style="margin-bottom:10px">
-        <div class="field"><label>排便の出方</label><select id="ci-stt"><option>なし</option><option>スッキリバナナ</option><option>少なめ</option><option>軟便</option><option>コロコロ</option></select></div>
+        <div class="field"><label>排尿回数</label><input id="ci-ur" type="number" min="0" inputmode="numeric" placeholder="例：6"></div>
+        <div class="field"><label>排便回数</label><input id="ci-st" type="number" min="0" inputmode="numeric" placeholder="例：1"></div>
+        <div class="field full"><label>排便の出方</label><select id="ci-stt"><option>なし</option><option>スッキリバナナ</option><option>少なめ</option><option>軟便</option><option>コロコロ</option></select></div>
         <div class="field"><label>ウエスト (cm)</label><input id="ci-waist" type="number" step="0.1" inputmode="decimal" placeholder="例：75.0"></div>
         <div class="field"><label>へそ周囲 (cm)</label><input id="ci-navel" type="number" step="0.1" inputmode="decimal" placeholder="例：80.0"></div>
+        <div class="field"><label>飲酒</label><select id="ci-alc"><option>なし</option><option>あり</option></select></div>
+        <div class="field"><label>外食</label><select id="ci-eo"><option>なし</option><option>あり</option></select></div>
       </div>
       <div class="field" style="margin-bottom:8px"><label>今日の運動</label><input id="ci-ex" placeholder="ウォーキング30分など"></div>
       <div class="field" style="margin-bottom:16px"><label>今日の気持ち・コメント</label><textarea id="ci-cm" rows="3" placeholder="体調の変化、気づきなど..."></textarea></div>
@@ -1007,11 +1011,27 @@ function buildStaffChart(ls,c){
   const ctx=document.getElementById('staffWeightChart').getContext('2d');
   const dark=window.matchMedia('(prefers-color-scheme:dark)').matches;
   const grid=dark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)'; const tc=dark?'#6b6b66':'#888';
-  staffChart=new Chart(ctx,{type:'line',data:{labels:ls.map(l=>fmtDate(l.date)),datasets:[
-    {label:'朝体重',data:ls.map(l=>l.morning),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',borderWidth:2,pointRadius:3,tension:0.3,fill:true},
-    {label:'夜体重',data:ls.map(l=>l.evening),borderColor:'#378ADD',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,tension:0.3,borderDash:[4,2]},
-    {label:'目標',data:ls.map(()=>c.goalWeight),borderColor:'#E24B4A',backgroundColor:'transparent',borderWidth:1,borderDash:[6,3],pointRadius:0}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:11},color:tc,usePointStyle:true,boxWidth:20}}},scales:{x:{grid:{color:grid},ticks:{font:{size:10},color:tc,maxTicksLimit:8}},y:{grid:{color:grid},ticks:{font:{size:11},color:tc,callback:v=>v+'kg'}}}}});
+  staffChart=new Chart(ctx,{
+    data:{
+      labels:ls.map(l=>fmtDate(l.date)),
+      datasets:[
+        {type:'line',label:'朝体重',data:ls.map(l=>l.morning),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',borderWidth:2,pointRadius:3,tension:0.3,fill:true,yAxisID:'y'},
+        {type:'line',label:'夜体重',data:ls.map(l=>l.evening),borderColor:'#378ADD',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,tension:0.3,borderDash:[4,2],yAxisID:'y'},
+        {type:'line',label:'目標',data:ls.map(()=>c.goalWeight),borderColor:'#E24B4A',backgroundColor:'transparent',borderWidth:1,borderDash:[6,3],pointRadius:0,yAxisID:'y'},
+        {type:'bar',label:'排尿回数',data:ls.map(l=>l.urineCount||null),backgroundColor:'rgba(24,95,165,0.3)',borderColor:'rgba(24,95,165,0.6)',borderWidth:1,yAxisID:'y2',barPercentage:0.4},
+        {type:'bar',label:'排便回数',data:ls.map(l=>l.stoolCount||null),backgroundColor:'rgba(186,117,23,0.35)',borderColor:'rgba(186,117,23,0.7)',borderWidth:1,yAxisID:'y2',barPercentage:0.4},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{size:11},color:tc,usePointStyle:true,boxWidth:20}}},
+      scales:{
+        x:{grid:{color:grid},ticks:{font:{size:10},color:tc,maxTicksLimit:8}},
+        y:{grid:{color:grid},ticks:{font:{size:11},color:tc,callback:v=>v+'kg'},position:'left'},
+        y2:{grid:{display:false},ticks:{font:{size:11},color:tc,stepSize:1,callback:v=>v+'回'},position:'right',min:0,max:Math.max(10,Math.max(...ls.map(l=>Math.max(l.urineCount||0,l.stoolCount||0)))+2)}
+      }
+    }
+  });
 }
 
 let waistChart=null;
