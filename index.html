@@ -842,34 +842,42 @@ async function saveLog(role){
   // Supabaseから直接その日の記録を確認
   const existingArr=await sbFetch(`logs?client_id=eq.${currentClientId}&date=eq.${dateInput}&select=*`);
   const existing=existingArr.length?existingArr[0]:null;
+
+  // 値がある場合は新しい値、空の場合は既存データを引き継ぐ
+  function val(newVal, existingVal){ return (newVal!==null&&newVal!==''&&newVal!==undefined)?newVal:existingVal??null; }
+  function numVal(id, existingVal){ const v=parseFloat(document.getElementById(id)?.value); return !isNaN(v)&&document.getElementById(id)?.value!==''?v:existingVal??null; }
+  function intVal(id, existingVal){ const v=parseInt(document.getElementById(id)?.value); return !isNaN(v)&&document.getElementById(id)?.value!==''?v:existingVal??null; }
+  function selVal(id, existingVal){ const el=document.getElementById(id); if(!el)return existingVal??null; return el.value||existingVal??null; }
+  function txtVal(id, existingVal){ const el=document.getElementById(id); if(!el)return existingVal??null; return el.value.trim()||existingVal??null; }
+
   const log={
     id:existing?existing.id:'l_'+Date.now(),
     clientId:currentClientId, date:dateInput, morning,
-    evening:parseFloat(document.getElementById(`${p}-e`).value)||null,
-    sleepTime:document.getElementById(`${p}-sl`)?.value||null,
-    sleepQuality:document.getElementById(`${p}-sq`).value,
-    water:document.getElementById(`${p}-wt`).value,
-    alcohol:document.getElementById(`${p}-alc`)?.value||null,
-    menstruation:document.getElementById(`${p}-men`)?.value||null,
-    breakfast:document.getElementById(`${p}-bf`).value,
-    breakfastTime:document.getElementById(`${p}-bf-t`)?.value||null,
-    breakfastG:parseInt(document.getElementById(`${p}-bf-g`)?.value)||null,
-    breakfastImg:bfImg||existing?.breakfastImg||null,
-    lunch:document.getElementById(`${p}-lu`).value,
-    lunchTime:document.getElementById(`${p}-lu-t`)?.value||null,
-    lunchG:parseInt(document.getElementById(`${p}-lu-g`)?.value)||null,
-    lunchImg:luImg||existing?.lunchImg||null,
-    dinner:document.getElementById(`${p}-di`).value,
-    dinnerTime:document.getElementById(`${p}-di-t`)?.value||null,
-    dinnerG:parseInt(document.getElementById(`${p}-di-g`)?.value)||null,
-    dinnerImg:diImg||existing?.dinnerImg||null,
-    urineCount:parseInt(document.getElementById(`${p}-ur`)?.value)||null,
-    stoolCount:parseInt(document.getElementById(`${p}-st`)?.value)||null,
-    stoolType:document.getElementById(`${p}-stt`)?.value||null,
-    waist:parseFloat(document.getElementById(`${p}-waist`)?.value)||null,
-    navel:parseFloat(document.getElementById(`${p}-navel`)?.value)||null,
-    exercise:document.getElementById(`${p}-ex`).value,
-    comment:document.getElementById(`${p}-cm`).value
+    evening:numVal(`${p}-e`, existing?.evening),
+    sleepTime:selVal(`${p}-sl`, existing?.sleep_time),
+    sleepQuality:selVal(`${p}-sq`, existing?.sleep_quality),
+    water:selVal(`${p}-wt`, existing?.water),
+    alcohol:selVal(`${p}-alc`, existing?.alcohol),
+    menstruation:selVal(`${p}-men`, existing?.menstruation),
+    breakfast:txtVal(`${p}-bf`, existing?.breakfast),
+    breakfastTime:txtVal(`${p}-bf-t`, existing?.breakfast_time),
+    breakfastG:intVal(`${p}-bf-g`, existing?.breakfast_g),
+    breakfastImg:bfImg||existing?.breakfast_img||null,
+    lunch:txtVal(`${p}-lu`, existing?.lunch),
+    lunchTime:txtVal(`${p}-lu-t`, existing?.lunch_time),
+    lunchG:intVal(`${p}-lu-g`, existing?.lunch_g),
+    lunchImg:luImg||existing?.lunch_img||null,
+    dinner:txtVal(`${p}-di`, existing?.dinner),
+    dinnerTime:txtVal(`${p}-di-t`, existing?.dinner_time),
+    dinnerG:intVal(`${p}-di-g`, existing?.dinner_g),
+    dinnerImg:diImg||existing?.dinner_img||null,
+    urineCount:intVal(`${p}-ur`, existing?.urine_count),
+    stoolCount:intVal(`${p}-st`, existing?.stool_count),
+    stoolType:selVal(`${p}-stt`, existing?.stool_type),
+    waist:numVal(`${p}-waist`, existing?.waist),
+    navel:numVal(`${p}-navel`, existing?.navel),
+    exercise:txtVal(`${p}-ex`, existing?.exercise),
+    comment:txtVal(`${p}-cm`, existing?.comment)
   };
   if(existing){if(!confirm(`${dateInput}の記録があります。上書きしますか？`))return;}
   try{
