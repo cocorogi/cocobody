@@ -835,11 +835,11 @@ async function saveLog(role){
   const existing=existingArr.length?existingArr[0]:null;
 
   // 値がある場合は新しい値、空の場合は既存データを引き継ぐ
-  function val(newVal, existingVal){ return (newVal!==null&&newVal!==''&&newVal!==undefined)?newVal:existingVal??null; }
-  function numVal(id, existingVal){ const v=parseFloat(document.getElementById(id)?.value); return !isNaN(v)&&document.getElementById(id)?.value!==''?v:existingVal??null; }
-  function intVal(id, existingVal){ const v=parseInt(document.getElementById(id)?.value); return !isNaN(v)&&document.getElementById(id)?.value!==''?v:existingVal??null; }
-  function selVal(id, existingVal){ const el=document.getElementById(id); if(!el)return existingVal??null; return el.value||existingVal??null; }
-  function txtVal(id, existingVal){ const el=document.getElementById(id); if(!el)return existingVal??null; return el.value.trim()||existingVal??null; }
+  function val(newVal, existingVal){ return (newVal!==null&&newVal!==''&&newVal!==undefined)?newVal:(existingVal||null); }
+  function numVal(id, existingVal){ const el=document.getElementById(id); const v=parseFloat(el?.value); return !isNaN(v)&&el?.value!==''?v:(existingVal||null); }
+  function intVal(id, existingVal){ const el=document.getElementById(id); const v=parseInt(el?.value); return !isNaN(v)&&el?.value!==''?v:(existingVal||null); }
+  function selVal(id, existingVal){ const el=document.getElementById(id); if(!el)return (existingVal||null); return el.value||(existingVal||null); }
+  function txtVal(id, existingVal){ const el=document.getElementById(id); if(!el)return (existingVal||null); return el.value.trim()||(existingVal||null); }
 
   const log={
     id:existing?existing.id:'l_'+Date.now(),
