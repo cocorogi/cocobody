@@ -629,15 +629,6 @@ async function hashPassword(pw){
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-/* ===== ログイン ===== */
-function switchLoginTab(mode){
-  loginMode=mode;
-  document.getElementById('tab-staff').classList.toggle('active',mode==='staff');
-  document.getElementById('tab-client').classList.toggle('active',mode==='client');
-  document.getElementById('login-id-label').textContent=mode==='staff'?'スタッフID':'ログインID（顧客）';
-  document.getElementById('login-id').placeholder=mode==='staff'?'':'顧客ID';
-}
-
 async function doLogin(){
   const id=document.getElementById('login-id').value.trim();
   const pw=document.getElementById('login-pw').value;
