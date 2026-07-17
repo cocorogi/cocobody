@@ -356,7 +356,7 @@ button:active{transform:scale(0.98)}
       <div class="field"><label>開始体重 (kg)*</label><input id="c-start" type="number" step="0.1" placeholder="65.0"></div>
       <div class="field"><label>目標体重 (kg)*</label><input id="c-goal" type="number" step="0.1" placeholder="52.0"></div>
       <div class="field"><label>ログインID（顧客用）</label><input id="c-lid" placeholder="tanaka01"></div>
-      <div class="field"><label>パスワード（顧客用）</label><input id="c-lpw" placeholder="1234" type="password"></div>
+      <div class="field"><label>パスワード（顧客用）<span style="font-size:10px;color:var(--tx3)"> ※編集時は空白で変更なし</span></label><input id="c-lpw" placeholder="新しいパスワードを入力" type="password"></div>
     </div>
     <div class="modal-footer">
       <button onclick="closeModal()">キャンセル</button>
@@ -949,9 +949,12 @@ function buildClientsGrid(){
     const ls=clientLogs(c.id); const last=ls[ls.length-1];
     const delta=last?(last.morning-c.startWeight).toFixed(1):null;
     const prog=last?Math.min(100,Math.max(0,Math.round((c.startWeight-last.morning)/(c.startWeight-c.goalWeight)*100))):0;
-    return `<div class="client-card" onclick="selectClient('${c.id}','staff');showStaffPage('report')">
-      <div style="width:40px;height:40px;border-radius:50%;background:var(--green-light);color:var(--green-dark);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;margin-bottom:8px">${initials(c.name)}</div>
-      <div style="font-size:13px;font-weight:500">${c.name}</div>
+    return `<div class="client-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--green-light);color:var(--green-dark);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500">${initials(c.name)}</div>
+        <button onclick="openClientModal('${c.id}')" style="padding:4px 8px;font-size:11px;color:var(--tx2);border-color:var(--br)"><i class="ti ti-edit"></i>編集</button>
+      </div>
+      <div style="font-size:13px;font-weight:500;cursor:pointer" onclick="selectClient('${c.id}','staff');showStaffPage('report')">${c.name}</div>
       <div style="font-size:11px;color:var(--tx2)">${c.age?c.age+'歳 · ':''}目標 ${c.goalWeight}kg</div>
       <div style="font-size:11px;color:var(--tx2);margin-top:4px">現在 <strong>${last?last.morning+'kg':'未記録'}</strong>${delta!==null?' ('+(delta<0?delta:'+'+delta)+'kg)':''}</div>
       <div class="progress-bar"><div class="progress-fill" style="width:${prog}%"></div></div>
